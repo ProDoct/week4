@@ -2,38 +2,47 @@
 assignment of 4th week of getting and cleaning data Coursera
 
 
-#bind test and train data with cbind
-x <- rbind(x_train, x_test)
-y <- rbind(y_train, y_test)
-Subject <- rbind(subject_train, subject_test)
-BindData <- cbind(Subject, y, x)
 
 
-#Extracts only the measurements on the mean and standard deviation for each measurement.
-TData <- BindData %>% select(subject, code, contains("mean"), contains("std"))
-#Uses descriptive activity names to name the activities in the data set
-TData$code <- activities[TData$code, 2]
+Assign each data to variables
+features <- features.txt : 561 rows, 2 columns
+The features selected for this database come from the accelerometer and gyroscope 3-axial raw signals tAcc-XYZ and tGyro-XYZ.
+activities <- activity_labels.txt : 6 rows, 2 columns
+List of activities performed when the corresponding measurements were taken and its codes (labels)
+subject_test <- test/subject_test.txt : 2947 rows, 1 column
+contains test data of 9/30 volunteer test subjects being observed
+x_test <- test/X_test.txt : 2947 rows, 561 columns
+contains recorded features test data
+y_test <- test/y_test.txt : 2947 rows, 1 columns
+contains test data of activities’code labels
+subject_train <- test/subject_train.txt : 7352 rows, 1 column
+contains train data of 21/30 volunteer subjects being observed
+x_train <- test/X_train.txt : 7352 rows, 561 columns
+contains recorded features train data
+y_train <- test/y_train.txt : 7352 rows, 1 columns
+contains train data of activities’code labels
 
+Merges the training and the test sets to create one data set
+x (10299 rows, 561 columns) is created by merging x_train and x_test using cbind() function
+y (10299 rows, 1 column) is created by merging y_train and y_test using cbind() function
+Subject (10299 rows, 1 column) is created by merging subject_train and subject_test using cbind() function
+bind_Data (10299 rows, 563 column) is created by binding Subject, Y and X using cbind() function
 
-#Appropriately labels the data set with descriptive variable names
-names(TData)[2] = "activity"
-names(TData)<-gsub("Acc", "Accelerometer", names(TData))
-names(TData)<-gsub("Gyro", "Gyroscope", names(TData))
-names(TData)<-gsub("BodyBody", "Body", names(TData))
-names(TData)<-gsub("Mag", "Magnitude", names(TData))
-names(TData)<-gsub("^t", "Time", names(TData))
-names(TData)<-gsub("^f", "Frequency", names(TData))
-names(TData)<-gsub("tBody", "TimeBody", names(TData))
-names(TData)<-gsub("-mean()", "Mean", names(TData), ignore.case = TRUE)
-names(TData)<-gsub("-std()", "STD", names(TData), ignore.case = TRUE)
-names(TData)<-gsub("-freq()", "Frequency", names(TData), ignore.case = TRUE)
-names(TData)<-gsub("angle", "Angle", names(TData))
-names(TData)<-gsub("gravity", "Gravity", names(TData))
+Extracts only the measurements on the mean and standard deviation for each measurement
+TData (10299 rows, 88 columns) is created by subsetting bind_Data, selecting only columns: subject, code and the measurements on the mean and standard deviation (std) for each measurement
 
+Uses descriptive activity names to name the activities in the data set
+Entire numbers in code column of the TData replaced with corresponding activity taken from second column of the activities variable
 
-#From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject
-FData <- TData %>%
-  group_by(subject, activity) %>%
-  summarise_all(funs(mean))
- #write file 
-write.table(FData, "FinalData.txt", row.name=FALSE)
+Appropriately labels the data set with descriptive variable names
+code column in TData renamed into activities
+All Acc in column’s name replaced by Accelerometer
+All Gyro in column’s name replaced by Gyroscope
+All BodyBody in column’s name replaced by Body
+All Mag in column’s name replaced by Magnitude
+All start with character f in column’s name replaced by Frequency
+All start with character t in column’s name replaced by Time
+
+From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject
+FData (180 rows, 88 columns) is created by sumarizing TData taking the means of each variable for each activity and each subject, after groupped by subject and activity.
+Export FData into FinalData.txt file.
